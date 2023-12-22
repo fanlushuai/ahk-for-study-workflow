@@ -109,7 +109,7 @@ waitForImage(&outputX, &outputY, x, y, a, b, image, maxTime, timePer) {
     return false
 }
 
-
+; 微信点赞桌面版本。操作说明：1. 需要打开，微信朋友圈。2. 光标离开界面，点赞动作，休眠。光标回归，点赞继续。【ok】
 wechatStar() {
     CoordMode "Mouse", "Screen"
 
@@ -305,7 +305,7 @@ searchSelectionOnWord() {
     SendX "{Enter}" ; 让他自己查找一个吧
 }
 
-line(str) {
+inputAndEnter(str) {
     SendText str
     Send "{Enter}"
 }
