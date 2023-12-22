@@ -6,6 +6,7 @@ SetWorkingDir A_ScriptDir ; Ensures a consistent starting directory
 SendMode "Input"
 CoordMode "Mouse", "Screen"
 
+
 trimAllBlankLineInClipboard() {
     text := A_Clipboard
     text := StrReplace(text, "`r`n`r`n", "`r`n")
@@ -25,7 +26,7 @@ trimAllBlankLineInClipboard() {
 }
 
 copyTextSelected() {
-    A_Clipboard := ""
+    A_Clipboard := "" ; 每次都会清空，意味着，一个高亮，只会被操作一次。下次再来，清除了。
     Sleep 10
 
     Send "^c"
@@ -35,8 +36,11 @@ copyTextSelected() {
     ;     MsgBox "操作需要先选中了文本", , "Iconi T1.2"
     ;     return
     ; }
+    length := StrLen(Trim(A_Clipboard))
 
-    return A_Clipboard
+    OutputDebug "复制的内容长度" length
+
+    return (length > 0) ? A_Clipboard : ""
 }
 
 ; 参考： https://www.autohotkey.com/boards/viewtopic.php?t=97706  鼠标坐标，在多分辨率，多屏幕，多缩放小的问题。
@@ -56,6 +60,11 @@ getProcessNameAtMousePos() {
 
     storeProcessName := WinGetProcessName(storeWindowId)
     return storeProcessName
+}
+
+mouseInRange(x, a, y, b) {
+    MouseGetPos &mouseCoordX, &mouseCoordY, &storeWindowId, &control
+    return mouseCoordX > x and mouseCoordX < a and mouseCoordY > y and mouseCoordY < b
 }
 
 SendX(key, time := 50) {
@@ -109,7 +118,7 @@ wechatStar() {
 
     WinGetClientPos &X, &Y, &W, &H, "朋友圈"
 
-    ; 搜索的坐标范围（x1,y1）-(x2,y2)
+    ; 搜索的坐标范围（x1,y1）-(a,b)
     x := X
     y := Y + 40 ; 缩小范围。防止，在滚动的过程中。moment太靠近顶部，导致误点触
     a := X + W
@@ -143,16 +152,10 @@ wechatStar() {
         CoordMode "Mouse", "Screen"
         Sleep 100
 
-        ; 鼠标光标，在界面内。不然就阻塞住
-        MouseGetPos &mouseCoordX, &mouseCoordY, &storeWindowId, &control
-        mouseInWin := mouseCoordX > X and mouseCoordX < X + W and mouseCoordY > Y - 30 and mouseCoordY < Y + H
+        ; 鼠标光标，在界面内。不然就阻塞住，并且光标在目标软件上面。
         ;-30的迷惑行为，原因：xy，坐标不是特别准，在边缘地带，容易导致程序自动停止。所以，扩在范围，来终结影响。
-
-        while (!mouseInWin or getProcessNameAtMousePos() != "WeChat.exe") {
+        while (!mouseInRange(X, X + W, Y - 30, Y + H) or getProcessNameAtMousePos() != "WeChat.exe") {
             Sleep 1000
-
-            MouseGetPos &mouseCoordX, &mouseCoordY, &storeWindowId, &control
-            mouseInWin := mouseCoordX > X and mouseCoordX < X + W and mouseCoordY > Y - 30 and mouseCoordY < Y + H
         }
 
         Send "{ WheelDown 6 }"
@@ -164,8 +167,9 @@ wechatStar() {
 }
 
 translateSelectionByGoogleWeb() {
-
-    copyTextSelected
+    if (copyTextSelected() == "") {
+        return
+    }
 
     sureAtChrome
 
@@ -175,7 +179,7 @@ translateSelectionByGoogleWeb() {
     a := X + W
     b := Y + H
 
-    SendX "^1" 100  ; 到第1个tab(是Google翻译)
+    SendX "^1" 100  ; 到第1个tab(是Google翻译)  // fix 可以更加自动化的，打开chrometab
     CoordMode "Pixel", "Screen"
 
     ; focus
@@ -203,6 +207,7 @@ translateSelectionByGoogleWeb() {
     CoordMode "Mouse", "Screen"
 }
 
+
 translatePageAllOnChrome() {
     ; 以下方式：任选一种
     ; 1. Ctrl + Shift + L（Windows）/ Command + Shift + L（Mac）：这是Google Chrome浏览器的默认快捷键。按下这个组合键后，浏览器会自动检测当前网页的语言，并将其翻译成你的首选语言。
@@ -213,19 +218,24 @@ translatePageAllOnChrome() {
     Sleep 50
     Send "t"
 }
+
+
 copySelectionToWordTop() {
 
-    copyTextSelected
+    if (copyTextSelected() == "") {
+        return
+    }
     trimAllBlankLineInClipboard
 
     processNameForBack := getProcessNameAtMousePos()
 
     sureAtWord
 
-    ; 软件可能做了按键的粘滞检查。不可以直接用 SendX  "^{Home}"
+    ; 软件可能做了按键的粘滞检查。不可以直接用 SendX  "^{Home}"。需要拆分开
+    ; 到word开头
     SendInput "{Ctrl Down}{Home Down}"
-    Sleep 50
-    SendInput "{Ctrl Up}{Home Up}"
+    Sleep 100
+    SendInput "{Home Up}{Ctrl Up}"
 
     SendX "^v"      ; 粘贴
     SendX "{Enter}"  ; 两次换行
@@ -234,8 +244,13 @@ copySelectionToWordTop() {
     ; sureAtChrome
     sureAtWindow "ahk_exe " . processNameForBack
 }
+
+
 copySelectionToWordBottom() {
-    copyTextSelected
+    if (copyTextSelected() == "") {
+        return
+    }
+
     trimAllBlankLineInClipboard
 
     processNameForBack := getProcessNameAtMousePos()
@@ -244,8 +259,9 @@ copySelectionToWordBottom() {
 
     ; 软件可能做了按键的粘滞检查。不可以直接用 SendX "^{End}"
     SendInput "{Ctrl Down}{End Down}"
-    Sleep 50
-    SendInput "{Ctrl Up}{End Up}"
+    Sleep 100
+    SendInput "{End Up}{Ctrl Up}"
+
 
     SendX "{Enter}"
     SendX "^v"
@@ -254,9 +270,12 @@ copySelectionToWordBottom() {
     sureAtWindow "ahk_exe " . processNameForBack
 }
 
+
 searchSelectionOnWeb() {
 
-    copyTextSelected
+    if (copyTextSelected() == "") {
+        return
+    }
 
     processNameForBack := getProcessNameAtMousePos()
     sureAtChrome
@@ -269,9 +288,12 @@ searchSelectionOnWeb() {
     sureAtWindow "ahk_exe " . processNameForBack ; 前面获取鼠标指针处进程。再次回到那里。更加通用！
 }
 
+
 searchSelectionOnWord() {
 
-    SendX "^c"
+    if (copyTextSelected() == "") {
+        return
+    }
 
     sureAtWord
     SendX "^f"
@@ -281,63 +303,14 @@ searchSelectionOnWord() {
     SendX "^v"
 
     SendX "{Enter}" ; 让他自己查找一个吧
-
 }
-; ====================================键位-功能-映射=======================================
 
-;挂起，这样脚本不用工作。CapsLock靠近手指，方便操作。
-#SuspendExempt
-CapsLock:: Suspend
-#SuspendExempt False
-
-; 切到chrome
-7:: sureAtChrome
-
-;自由选择内容复制，利用左键的状态，【讨论？】
-`:: copyTextSelected
-
-; 划词翻译 【ok】
-F2:: translateSelectionByGoogleWeb
-
-#HotIf WinActive("ahk_exe chrome.exe")
-; 翻译整个网页    chrome中   中文翻译成英文的？估计可以在chrome设置一下【讨论？】
-F3:: translatePageAllOnChrome
-#HotIf
-
-; 文字收集器，追加到文档末尾。 全部搜集到word 【ok】【微调……】
-F4:: copySelectionToWordBottom
-
-; 文字收集器，追加到文档首部。 全部搜集到word 【ok】【微调……】
-4:: copySelectionToWordTop
-
-;View More 【ok】
-5:: SendX "{WheelDown 1}"
-
-F1:: searchSelectionOnWeb ; 网络搜索 选中内容 【ok】
-
-+F2:: searchSelectionOnWord ; word中搜索 选中内容 【ok】
-
-3:: wechatStar  ; 微信点赞桌面版本。操作说明：1. 需要打开，微信朋友圈。2. 光标离开界面，点赞动作，休眠。光标回归，点赞继续。【ok】
-
-; #HotIf WinActive("ahk_exe wps.exe") or WinActive("ahk_exe winword.exe")
-
-;发送分隔线  【ok】
-6:: {
-    SendText "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
+line(str) {
+    SendText str
     Send "{Enter}"
 }
 
-; 【ok】
-0:: {
-    SendText "1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1"
-    Send "{Enter}"
-}
 
-; 【ok】
-9:: {
-    SendText "2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2"
-    Send "{Enter}"
-}
+#Include  %A_ScriptDir%\keymap-config.ahk
 
-; #HotIf
-
+return
