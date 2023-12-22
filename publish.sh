@@ -1,4 +1,7 @@
 #!/bin/bash
+# apt-get install zip unzip
+# apt-get install jq
+
 set -e
 name=my-ahks
 version=v1.0
