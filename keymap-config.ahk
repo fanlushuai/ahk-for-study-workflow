@@ -9,7 +9,9 @@ CapsLock:: Suspend
 
 `:: copyTextSelected
 7:: sureAtChrome
+
 3:: wechatStar
+^3::stopWechatStar
 
 F2:: translateSelectionByGoogleWeb
 #HotIf WinActive("ahk_exe chrome.exe")

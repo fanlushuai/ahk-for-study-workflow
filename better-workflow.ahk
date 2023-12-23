@@ -109,8 +109,15 @@ waitForImage(&outputX, &outputY, x, y, a, b, image, maxTime, timePer) {
     return false
 }
 
-; 微信点赞桌面版本。操作说明：1. 需要打开，微信朋友圈。2. 光标离开界面，点赞动作，休眠。光标回归，点赞继续。【ok】
+global exitStar := true
+
+stopWechatStar() {
+    global exitStar := true
+}
+
 wechatStar() {
+    global exitStar := false
+
     CoordMode "Mouse", "Screen"
 
     sureAtWindow "朋友圈"
@@ -128,6 +135,12 @@ wechatStar() {
     counter := 0
 
     while (counter < maxTimes) {
+        if exitStar {
+            MsgBox "收到，已撤退", , "Iconi T1.2"
+            return
+        }
+
+
         CoordMode "Pixel", "Screen"
         Sleep 100
 
