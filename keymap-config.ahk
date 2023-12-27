@@ -8,10 +8,20 @@ CapsLock:: Suspend
 9:: inputAndEnter "2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2"
 
 `:: copyTextSelected
+
+
+~^LButton:: {
+    ; 等待左键弹起。超时时间30s
+    if KeyWait("LButton", "T30") {
+        Send "^c"
+    }
+}
+
+
 7:: sureAtChrome
 
 3:: wechatStar
-^3::stopWechatStar
+^3:: stopWechatStar
 
 F2:: translateSelectionByGoogleWeb
 #HotIf WinActive("ahk_exe chrome.exe")
@@ -23,4 +33,3 @@ F4:: copySelectionToWordBottom
 
 F1:: searchSelectionOnWeb
 +F2:: searchSelectionOnWord
-
