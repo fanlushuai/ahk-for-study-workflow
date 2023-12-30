@@ -286,6 +286,17 @@ switchXunFeiFloatWin() {
     }
 }
 
+clearCache() {
+    global cache_x
+    global cache_xunfei_change_x
+    global cache_xunfei_putonghua_x
+    global cache_xunfei_suishengyi_x
+    cache_x := 0
+    cache_xunfei_change_x := 0
+    cache_xunfei_putonghua_x := 0
+    cache_xunfei_suishengyi_x := 0
+}
+
 ; ----------------------------------------
 
 global config_xunfei_location := '"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\讯飞输入法\语音悬浮窗.lnk"'
@@ -302,3 +313,8 @@ global config_xunfei_location := '"C:\ProgramData\Microsoft\Windows\Start Menu\P
 }
 
 3:: switchXunFeiFloatWin
+
+; 如果，浮动窗口，自己给他改变位置了。 发现，脚本点击不到了。
+; 那么需要清理一下缓存。 将下面的函数绑定即可。
+; 或者，直接重启脚本
+; 4::clearCache
