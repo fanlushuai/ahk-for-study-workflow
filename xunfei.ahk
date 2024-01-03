@@ -142,7 +142,7 @@ toSimpleChinese() {
     ; 这个范围，可以有效兼容，二级列表
     left_x := x - (1.5 * cache_w)
     left_y := 0
-    right_a := x + (1.5 * cache_w)
+    right_a := x + (2.5 * cache_w)
     right_b := A_ScreenHeight
 
     xunfei_putonghua_x := 0
@@ -251,7 +251,7 @@ toSuiShengYi() {
     ; 这个范围，可以有效兼容，二级列表
     left_x := x - (1.5 * cache_w)
     left_y := 0
-    right_a := x + (1.5 * cache_w)
+    right_a := x + (2.5 * cache_w)
     right_b := A_ScreenHeight
 
     xunfei_suishengyi_x := 0
@@ -356,7 +356,7 @@ toSuiShengYiMore(moreImage) {
     ; 这个范围，可以有效兼容，二级列表
     left_x := x - (1.5 * cache_w)
     left_y := 0
-    right_a := x + (1.5 * cache_w)
+    right_a := x + (2.5 * cache_w)
     right_b := A_ScreenHeight
 
     xunfei_suishengyimore_x := 0
@@ -383,7 +383,8 @@ toSuiShengYiMore(moreImage) {
     clickXY(xunfei_suishengyimore_x, xunfei_suishengyimore_y)
 
     ; 不再进行缓存。变化的目标，缓存起来费劲。目前没有好想法实现
-    Sleep 100
+    ; 多等待一下
+    Sleep 200
     if (ImageSearch(&FoundX, &FoundY, left_x, left_y, right_a, right_b, "*20  *TransBlack " imagePath(moreImage))) {
         clickXY(FoundX, FoundY)
     }
