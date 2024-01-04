@@ -405,5 +405,8 @@ startInputVoice() {
     Sleep 100
     Send config_xunfei_key_startVoice
 }
+
+global config_xunfei_location := '"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\讯飞输入法\语音悬浮窗.lnk"'
+global config_xunfei_key_startVoice := "{F10}"
 ; ----------------------------------------
 
