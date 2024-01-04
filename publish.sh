@@ -13,8 +13,8 @@ currentTime=$(date +"%m-%d_%H_%M")
 
 zipName=$name-$version-${currentTime}.zip
 
-# zip -r ${zipName} **/*.png **/*.py **/*.ahk *.py *.ahk *.js **/*.js
-zip -r ${zipName} **/xunfei*.png xunfei*.ahk kou_tu.py
+zip -r ${zipName} **/*.png **/*.py **/*.ahk *.py *.ahk *.js **/*.js
+# zip -r ${zipName} **/xunfei*.png xunfei*.ahk kou_tu.py
 
 publishLogName=publish-log.md
 
