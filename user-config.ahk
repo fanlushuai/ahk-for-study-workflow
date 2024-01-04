@@ -1,3 +1,26 @@
+#Requires AutoHotkey v2.0
+
+; -------------------------------- remove-blank-line
+
+
+#HotIf WinActive("ahk_exe winword.exe") or WinActive("ahk_exe wps.exe") or WinActive("ahk_exe code.exe")
+
+; 删除选中文本。先选中，再调用
+^+s:: {
+    removeBlankLineOnSelected()
+}
+
+F4:: {
+    Send "^a"   ;自动帮助用户选中
+    removeBlankLineOnSelected()
+}
+
+; trimOneBlankLine 没有用武之地，不开森
+
+#HotIf
+
+; --------------------------------better-workflow
+
 #SuspendExempt
 CapsLock:: Suspend
 #SuspendExempt False
@@ -67,3 +90,35 @@ F4:: copySelectionToWordBottom
 
 F1:: searchSelectionOnWeb
 +F2:: searchSelectionOnWord
+
+; --------------------------------xunfei
+
+
+global config_xunfei_location := '"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\讯飞输入法\语音悬浮窗.lnk"'
+global config_xunfei_key_startVoice := "{F10}"
+
+1:: {
+    bootXunFeiFloatWin
+    toSimpleChinese
+    startInputVoice
+}
+
+2:: {
+    bootXunFeiFloatWin
+    toSuiShengYi
+    startInputVoice
+}
+
+
+3:: switchXunFeiFloatWin
+
+4:: useSuiShengYiOf "cn2en"
+
+5:: useSuiShengYiOf "cn2yue"
+
+; 如果，浮动窗口，自己给他改变位置了。 发现，脚本点击不到了。
+; 那么需要清理一下缓存。 将下面的函数绑定即可。
+; 或者，直接重启脚本
+; 4::clearCache
+
+
