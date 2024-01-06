@@ -1,15 +1,15 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
-; 自动提权到管理员
-full_command_line := DllCall("GetCommandLine", "str")
-if not (A_IsAdmin or RegExMatch(full_command_line, " /restart(?!\S)"))
-{
-    try
-    {
-        Run '*RunAs "' A_ScriptFullPath '" /restart'
-    }
-    ExitApp
-}
+; ; 自动提权到管理员
+; full_command_line := DllCall("GetCommandLine", "str")
+; if not (A_IsAdmin or RegExMatch(full_command_line, " /restart(?!\S)"))
+; {
+;     try
+;     {
+;         Run '*RunAs "' A_ScriptFullPath '" /restart'
+;     }
+;     ExitApp
+; }
 
 KeyHistory 0
 SetWorkingDir A_ScriptDir ; Ensures a consistent starting directory

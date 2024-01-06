@@ -3,7 +3,8 @@
 
 
 
-
+; 1::translatePageAllOnChrome()
+; 2::undoTranslatePageAllOnChrome()
 
 
 

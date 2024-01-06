@@ -6,6 +6,20 @@ SetWorkingDir A_ScriptDir ; Ensures a consistent starting directory
 SendMode "Input"
 CoordMode "Mouse", "Screen"
 
+mouseClickBackForX(coordX, coordY) {
+    BlockInput 1
+
+    storeMouseCoordX := 0
+    storeMouseCoordY := 0
+    MouseGetPos &storeMouseCoordX, &storeMouseCoordY
+    SetCursorPos(coordX, coordY)
+    Sleep 50
+    Click
+    Sleep 50  ; x，按键在响应click事件的时候，需要等待一会。不然对click不响应。参考https://stackoverflow.com/questions/72043026/autohotkey-left-click-or-right-on-screen-triggered-via-hotkey-not-working
+    SetCursorPos(storeMouseCoordX, storeMouseCoordY)
+    BlockInput 0
+}
+
 
 trimAllBlankLineInClipboard() {
     text := A_Clipboard
@@ -125,6 +139,37 @@ translatePageAllOnChrome() {
     MouseClick "right"
     Sleep 50
     Send "t"
+}
+
+undoTranslatePageAllOnChrome() {
+    MouseClick "right"
+    Sleep 50
+    Send "t"
+    Sleep 100
+
+    WinGetClientPos &X, &Y, &W, &H, "ahk_exe chrome.exe"
+    x := X
+    y := Y
+    a := X + W
+    b := Y + H / 4  ;尽量缩小范围。但是这是不准确的。
+
+    ; CoordMode "Pixel", "Screen"
+
+    appear:=waitForImage(&translate_source_language_x_X, &translate_source_language_x_Y, x, y, a, b, "*80  *TransBlack " imagePath("translate_source_language_x.png"), 1501, 300)
+
+    if(appear){
+        if (ImageSearch(&translate_source_language_y_X, &translate_source_language_y_Y, x, y, a, b, "*180  *TransBlack " imagePath("translate_source_language_y.png"))) {
+
+            locationOfSourceLanguage_x := translate_source_language_x_X
+            locationOfSourceLanguage_y := translate_source_language_y_Y
+
+            ; 定位的坐标不准确，手动搞点偏移 
+            mouseClickBackForX(locationOfSourceLanguage_x+40, locationOfSourceLanguage_y+30)
+        }
+    }
+    
+    OutputDebug "end"
+    ; CoordMode "Mouse", "Screen"
 }
 
 
